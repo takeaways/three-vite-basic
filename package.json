@@ -1,9 +1,5 @@
 {
-<<<<<<< HEAD
   "name": "threejs-vite-base",
-=======
-  "name": "three-vite-basic",
->>>>>>> b6cd600 (init project)
   "private": true,
   "version": "0.0.0",
   "scripts": {
@@ -12,7 +8,6 @@
     "preview": "vite preview"
   },
   "devDependencies": {
-<<<<<<< HEAD
     "@typescript-eslint/eslint-plugin": "^5.25.0",
     "@typescript-eslint/parser": "^5.25.0",
     "eslint": "^8.15.0",
@@ -27,9 +22,3 @@
     "three": "^0.140.2"
   }
 }
-=======
-    "typescript": "^4.5.4",
-    "vite": "^2.9.9"
-  }
-}
->>>>>>> b6cd600 (init project)

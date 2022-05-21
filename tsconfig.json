@@ -14,12 +14,8 @@
     "noUnusedLocals": true,
     "noUnusedParameters": true,
     "noImplicitReturns": true,
-<<<<<<< HEAD
     "skipLibCheck": true,
     "baseUrl": "./src"
-=======
-    "skipLibCheck": true
->>>>>>> b6cd600 (init project)
   },
   "include": ["src"]
 }
