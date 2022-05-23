@@ -5,9 +5,7 @@ class App {
   private renderer: THREE.WebGLRenderer;
   private scene: THREE.Scene;
   private camera?: THREE.PerspectiveCamera;
-  private solarSystem?: THREE.Object3D<THREE.Event>;
-  private earthOrbit?: THREE.Object3D<THREE.Event>;
-  private moonOrbit?: THREE.Object3D<THREE.Event>;
+  private cube?: THREE.Group;
   constructor(private readonly container: HTMLElement) {
     this.renderer = new THREE.WebGLRenderer({ antialias: true });
     this.renderer.setPixelRatio(window.devicePixelRatio);
@@ -37,8 +35,7 @@ class App {
     const height = this.container.clientHeight;
 
     const camera = new THREE.PerspectiveCamera(75, width / height, 0.1, 1000);
-    camera.position.y = 12;
-    camera.position.z = 20;
+    camera.position.z = 4;
     this.camera = camera;
   };
 
@@ -51,56 +48,28 @@ class App {
   };
 
   private setupModel = () => {
-    this.solarSystem = new THREE.Object3D();
-    this.scene.add(this.solarSystem);
-
-    const radius = 1;
-    const widthSegments = 12;
-    const heightSegments = 12;
-    const sphreGeometry = new THREE.SphereGeometry(
-      radius,
-      widthSegments,
-      heightSegments,
-      heightSegments
+    // const geometry = new THREE.BoxGeometry(1, 1, 1, 2, 2, 2);
+    // const geometry = new THREE.CircleGeometry( 0.5, 16, Math.PI / 2, Math.PI / 2 );
+    // const geometry = new THREE.ConeGeometry(0.5, 1.6, 9, 9, true, 0, Math.PI);
+    // const geometry = new THREE.CylinderGeometry(0.9, 0.9, 0.5, 32, 12, true, 0, Math.PI);
+    // const geometry = new THREE.SphereGeometry(0.8, 32, 12, 0, Math.PI,0, Math.PI / 2);
+    // const geometry = new THREE.RingGeometry(0.2, 1, 6, 2, 0, Math.PI);
+    // const geometry = new THREE.PlaneGeometry(1, 2, 2, 4);
+    // const geometry = new THREE.TorusGeometry(0.9, 0.4, 24, 32, Math.PI);
+    // const geometry = new THREE.TorusKnotGeometry(0.6, 0.1, 64, 32, 3, 4);
+    const geometry = new THREE.TorusKnotGeometry(0.6, 0.1, 64, 32, 3, 4);
+    const material = new THREE.MeshPhongMaterial({ color: 0x515151 });
+    const cube = new THREE.Mesh(geometry, material);
+    const lineMaterial = new THREE.LineBasicMaterial({ color: 0xffff00 });
+    const line = new THREE.LineSegments(
+      new THREE.WireframeGeometry(geometry),
+      lineMaterial
     );
-
-    const sunMaterial = new THREE.MeshPhongMaterial({
-      emissive: 0xffff00,
-      flatShading: true,
-    });
-
-    const sunMesh = new THREE.Mesh(sphreGeometry, sunMaterial);
-    sunMesh.scale.set(3, 3, 3);
-    this.solarSystem.add(sunMesh);
-
-    // Earthq
-    this.earthOrbit = new THREE.Object3D();
-    this.solarSystem.add(this.earthOrbit);
-
-    const earthMaterial = new THREE.MeshPhongMaterial({
-      color: 0x2233ff,
-      emissive: 0x112244,
-      flatShading: true,
-    });
-
-    const earthMesh = new THREE.Mesh(sphreGeometry, earthMaterial);
-    this.earthOrbit.position.x = 10;
-    this.earthOrbit.add(earthMesh);
-
-    // Moon
-    this.moonOrbit = new THREE.Object3D();
-    this.moonOrbit.position.x = 2;
-    this.earthOrbit.add(this.moonOrbit);
-
-    const moonMaterial = new THREE.MeshPhongMaterial({
-      color: 0x888888,
-      emissive: 0x222222,
-      flatShading: true,
-    });
-
-    const moonMesh = new THREE.Mesh(sphreGeometry, moonMaterial);
-    moonMesh.scale.set(0.4, 0.4, 0.4);
-    this.moonOrbit.add(moonMesh);
+    const group = new THREE.Group();
+    group.add(cube);
+    group.add(line);
+    this.scene.add(group);
+    this.cube = group;
   };
 
   private resize = () => {
@@ -125,12 +94,12 @@ class App {
   };
 
   private update = (time: number) => {
-    time *= 0.001;
-    if (this.solarSystem && this.earthOrbit && this.moonOrbit) {
-      this.solarSystem.rotation.y = time / 2;
-      this.earthOrbit.rotation.y = time * 2;
-      this.moonOrbit.rotation.y = time * 5;
-    }
+    // if (!this.cube) {
+    //   throw new Error("Cube 없이 업데이트 할 수 없습니다.");
+    // }
+    // time *= 0.001;
+    // this.cube.rotation.x = time;
+    // this.cube.rotation.y = time;
   };
 }
 
