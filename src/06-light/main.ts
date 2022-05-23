@@ -6,12 +6,11 @@ class App {
   private renderer: THREE.WebGLRenderer;
   private scene: THREE.Scene;
   private camera?: THREE.PerspectiveCamera;
-  private light?: THREE.DirectionalLight;
+  private light?: THREE.SpotLight;
   private lightHelper?: THREE.SpotLightHelper;
   constructor(private readonly container: HTMLElement) {
     this.renderer = new THREE.WebGLRenderer({ antialias: true });
     this.renderer.setPixelRatio(window.devicePixelRatio);
-    this.renderer.shadowMap.enabled = true;
     this.container.appendChild(this.renderer.domElement);
 
     this.scene = new THREE.Scene();
@@ -41,22 +40,16 @@ class App {
   };
 
   private setupLight = () => {
-    this.light = new THREE.DirectionalLight(0xffffff, 0.5);
+    this.light = new THREE.SpotLight(0xffffff, 2);
     this.light.position.set(0, 5, 0);
-    this.light?.target?.position.set(0, 0, 0);
+    this.light.target.position.set(0, 0, 0);
+    this.light.angle = THREE.MathUtils.degToRad(40);
+    this.light.penumbra = 0.2;
     this.scene.add(this.light);
     this.scene.add(this.light.target);
-    this.light.castShadow = true;
-    this.light.shadow.camera.top = this.light.shadow.camera.right + 6;
-    this.light.shadow.camera.bottom = this.light.shadow.camera.left - 6;
-    this.light.shadow.mapSize.width = this.light.shadow.mapSize.height = 2048;
-    this.light.shadow.radius = 2;
 
-    const auxLight = new THREE.DirectionalLight(0xffffff, 0.5);
-    auxLight.position.set(0, 5, 0);
-    auxLight.target.position.set(0, 0, 0);
-    this.scene.add(auxLight.target);
-    this.scene.add(auxLight);
+    this.lightHelper = new THREE.SpotLightHelper(this.light);
+    this.scene.add(this.lightHelper);
   };
 
   private setupModel = () => {
@@ -70,29 +63,17 @@ class App {
 
     const ground = new THREE.Mesh(groundGeometry, groundMaterial);
     ground.rotation.x = THREE.MathUtils.degToRad(-90);
-    ground.receiveShadow = true;
     this.scene.add(ground);
 
     // sphere
-    // const torusGeometry = new THREE.SphereGeometry(1.5, 64, 64, 0, Math.PI);
-    const bigSphereGeometry = new THREE.TorusKnotGeometry(
-      1,
-      0.3,
-      128,
-      64,
-      2,
-      3
-    );
+    const bigSphereGeometry = new THREE.SphereGeometry(1.5, 64, 64, 0, Math.PI);
     const bigSphereMaterial = new THREE.MeshStandardMaterial({
       color: 0xffffff,
       roughness: 0.1,
       metalness: 0.2,
     });
     const bigSphere = new THREE.Mesh(bigSphereGeometry, bigSphereMaterial);
-    bigSphere.receiveShadow = true;
-    bigSphere.castShadow = true;
-    // bigSphere.rotation.x = THREE.MathUtils.degToRad(-90);
-    bigSphere.position.y = 1.6;
+    bigSphere.rotation.x = THREE.MathUtils.degToRad(-90);
     this.scene.add(bigSphere);
 
     // torus
@@ -108,8 +89,6 @@ class App {
       const torus = new THREE.Mesh(torusGeometry, torusMaterial);
       torusPivot.rotation.y = THREE.MathUtils.degToRad(45 * i);
       torus.position.set(3, 0.5, 0);
-      torus.receiveShadow = true;
-      torus.castShadow = true;
       torusPivot.add(torus);
       this.scene.add(torusPivot);
     }
@@ -128,8 +107,6 @@ class App {
     );
     smallSpherePivot.add(smallSphere);
     smallSpherePivot.name = "smallSpherePivot";
-    smallSphere.receiveShadow = true;
-    smallSphere.castShadow = true;
     smallSphere.position.set(3, 0.5, 0);
     this.scene.add(smallSpherePivot);
   };
