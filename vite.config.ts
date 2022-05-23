@@ -10,6 +10,14 @@ const genAlias = (aliases: Array<string>) =>
 
 export default defineConfig({
   resolve: {
-    alias: genAlias(["constant", "utils", "components", "pages", "app", "types", "presenters"]),
+    alias: genAlias([
+      "constant",
+      "utils",
+      "components",
+      "pages",
+      "app",
+      "types",
+      "presenters",
+    ]),
   },
 });

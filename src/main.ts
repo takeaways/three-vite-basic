@@ -1,5 +1,6 @@
 import * as THREE from "three";
 import { OrbitControls } from "three/examples/jsm/controls/OrbitControls";
+import { VertexNormalsHelper } from "three/examples/jsm/helpers/VertexNormalsHelper";
 import "./style.css";
 class App {
   private renderer: THREE.WebGLRenderer;
@@ -37,70 +38,91 @@ class App {
     const height = this.container.clientHeight;
 
     const camera = new THREE.PerspectiveCamera(75, width / height, 0.1, 1000);
-    camera.position.y = 12;
-    camera.position.z = 20;
+    camera.position.z = 4;
     this.camera = camera;
+    this.scene.add(camera);
   };
 
   private setupLight = () => {
+    const ambientLight = new THREE.AmbientLight(0xffffff, 0.2);
+    this.scene.add(ambientLight);
+
     const color = 0xffffff;
     const intensity = 1;
     const light = new THREE.DirectionalLight(color, intensity);
     light.position.set(-1, 2, 4);
-    this.scene.add(light);
+    // this.scene.add(light);
+    if (this.camera) {
+      this.camera.add(light);
+    }
   };
 
   private setupModel = () => {
-    this.solarSystem = new THREE.Object3D();
-    this.scene.add(this.solarSystem);
+    const loader = new THREE.TextureLoader();
 
-    const radius = 1;
-    const widthSegments = 12;
-    const heightSegments = 12;
-    const sphreGeometry = new THREE.SphereGeometry(
-      radius,
-      widthSegments,
-      heightSegments,
-      heightSegments
+    const map = loader.load("images/glass/Glass_Window_002_basecolor.jpg");
+    const mapAO = loader.load(
+      "images/glass/Glass_Window_002_ambientOcclusion.jpg"
     );
+    const mapHeight = loader.load("images/glass/Glass_Window_002_height.png");
+    const mapNormal = loader.load("images/glass/Glass_Window_002_normal.jpg");
+    const mapRoughness = loader.load(
+      "images/glass/Glass_Window_002_roughness.jpg"
+    );
+    const mapMetalic = loader.load(
+      "images/glass/Glass_Window_002_metallic.jpg"
+    );
+    const mapAlpha = loader.load("images/glass/Glass_Window_002_opacity.jpg");
+    const mapLight = loader.load("images/glass/light.jpeg");
 
-    const sunMaterial = new THREE.MeshPhongMaterial({
-      emissive: 0xffff00,
-      flatShading: true,
+    const material = new THREE.MeshStandardMaterial({
+      map,
+
+      normalMap: mapNormal,
+
+      displacementMap: mapHeight,
+      displacementScale: 0.2,
+      displacementBias: -0.15,
+
+      aoMap: mapAO,
+      aoMapIntensity: 1,
+
+      roughnessMap: mapRoughness,
+      roughness: 0.5,
+
+      metalnessMap: mapMetalic,
+      metalness: 0.4,
+
+      // alphaMap: mapAlpha,
+      transparent: true,
+
+      side: THREE.DoubleSide,
+
+      lightMap: mapLight,
+      lightMapIntensity: 2,
     });
 
-    const sunMesh = new THREE.Mesh(sphreGeometry, sunMaterial);
-    sunMesh.scale.set(3, 3, 3);
-    this.solarSystem.add(sunMesh);
+    const box = new THREE.Mesh(
+      new THREE.BoxGeometry(1, 1, 1, 256, 256, 256),
+      material
+    );
+    box.position.set(-1, 0, 0);
+    box.geometry.attributes.uv2 = box.geometry.attributes.uv;
+    this.scene.add(box);
 
-    // Earthq
-    this.earthOrbit = new THREE.Object3D();
-    this.solarSystem.add(this.earthOrbit);
+    // const boxHelper = new VertexNormalsHelper(box, 0.1, 0xffff00);
+    // this.scene.add(boxHelper);
 
-    const earthMaterial = new THREE.MeshPhongMaterial({
-      color: 0x2233ff,
-      emissive: 0x112244,
-      flatShading: true,
-    });
+    const sphere = new THREE.Mesh(
+      new THREE.SphereGeometry(0.7, 512, 512),
+      material
+    );
+    sphere.position.set(1, 0, 0);
+    sphere.geometry.attributes.uv2 = sphere.geometry.attributes.uv;
+    this.scene.add(sphere);
 
-    const earthMesh = new THREE.Mesh(sphreGeometry, earthMaterial);
-    this.earthOrbit.position.x = 10;
-    this.earthOrbit.add(earthMesh);
-
-    // Moon
-    this.moonOrbit = new THREE.Object3D();
-    this.moonOrbit.position.x = 2;
-    this.earthOrbit.add(this.moonOrbit);
-
-    const moonMaterial = new THREE.MeshPhongMaterial({
-      color: 0x888888,
-      emissive: 0x222222,
-      flatShading: true,
-    });
-
-    const moonMesh = new THREE.Mesh(sphreGeometry, moonMaterial);
-    moonMesh.scale.set(0.4, 0.4, 0.4);
-    this.moonOrbit.add(moonMesh);
+    // const sphereHelpper = new VertexNormalsHelper(sphere, 0.1, 0xffff00);
+    // this.scene.add(sphereHelpper);
   };
 
   private resize = () => {
@@ -126,11 +148,6 @@ class App {
 
   private update = (time: number) => {
     time *= 0.001;
-    if (this.solarSystem && this.earthOrbit && this.moonOrbit) {
-      this.solarSystem.rotation.y = time / 2;
-      this.earthOrbit.rotation.y = time * 2;
-      this.moonOrbit.rotation.y = time * 5;
-    }
   };
 }
 
