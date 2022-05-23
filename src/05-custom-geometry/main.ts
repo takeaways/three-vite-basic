@@ -7,7 +7,6 @@ class App {
   private renderer: THREE.WebGLRenderer;
   private scene: THREE.Scene;
   private camera?: THREE.PerspectiveCamera;
-  private cute?: THREE.Mesh<THREE.BoxGeometry, THREE.MeshPhongMaterial>;
   constructor(private readonly container: HTMLElement) {
     this.renderer = new THREE.WebGLRenderer({ antialias: true });
     this.renderer.setPixelRatio(window.devicePixelRatio);

@@ -9,6 +9,7 @@ const genAlias = (aliases: Array<string>) =>
   }));
 
 export default defineConfig({
+  base: "https://takeaways.github.io/three-vite-basic",
   resolve: {
     alias: genAlias([
       "constant",
